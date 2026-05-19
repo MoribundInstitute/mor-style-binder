@@ -11,3 +11,20 @@
 
 # Local app settings
 /config.toml
+
+# Built packages
+*.deb
+*.pkg.tar.zst
+
+# Packaging build output
+/packaging/arch/src/
+/packaging/arch/pkg/
+/packaging/arch/*.pkg.tar.zst
+/packaging/arch/*.pkg.tar.zst.sig
+/packaging/arch/morstylebinder
+/packaging/arch/morstylebinder.desktop
+/packaging/arch/morstylebinder.png
+/packaging/arch/config.toml
+
+/packaging/debian/usr/
+/packaging/debian/DEBIAN/

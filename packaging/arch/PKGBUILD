@@ -1,0 +1,26 @@
+# Maintainer: Moribund Murdoch <moribundmurdoch@gmail.com>
+
+pkgname=morstylebinder-bin
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Desktop workbench for binding and refactoring modular theme CSS."
+arch=('x86_64')
+url="https://github.com/MoribundInstitute/mor-style-binder"
+license=('MIT')
+depends=()
+provides=('morstylebinder')
+conflicts=('morstylebinder')
+
+source=(
+  "morstylebinder"
+  "morstylebinder.desktop"
+  "morstylebinder.png"
+)
+
+sha256sums=('SKIP' 'SKIP' 'SKIP')
+
+package() {
+  install -Dm755 "$srcdir/morstylebinder" "$pkgdir/usr/bin/morstylebinder"
+  install -Dm644 "$srcdir/morstylebinder.desktop" "$pkgdir/usr/share/applications/morstylebinder.desktop"
+  install -Dm644 "$srcdir/morstylebinder.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/morstylebinder.png"
+}
