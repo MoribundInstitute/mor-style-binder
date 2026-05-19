@@ -1,0 +1,10 @@
+/target/
+/pkg/
+/src_css_backup/
+/bundle.css
+/blogger-theme.xml
+/import.css
+
+.DS_Store
+*.swp
+*.swo

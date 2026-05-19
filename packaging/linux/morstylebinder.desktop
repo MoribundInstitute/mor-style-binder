@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=MorStyleBinder
+Comment=Bind modular CSS sheets into one theme, or refactor monolithic theme CSS into modules.
+Exec=morstylebinder
+Icon=morstylebinder
+Terminal=false
+Categories=Development;Utility;
+StartupNotify=true

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MorStyleBinder icon">
+  <rect width="512" height="512" fill="#222129"/>
+  <rect x="28" y="28" width="456" height="456" fill="none" stroke="#a9aae2" stroke-width="10"/>
+  <rect x="48" y="48" width="416" height="416" fill="none" stroke="#555073" stroke-width="3"/>
+  <rect x="84" y="86" width="64" height="340" fill="#18171f" stroke="#a9aae2" stroke-width="5"/>
+  <circle cx="116" cy="150" r="16" fill="#222129" stroke="#bc8d6b" stroke-width="4"/>
+  <circle cx="116" cy="256" r="16" fill="#222129" stroke="#bc8d6b" stroke-width="4"/>
+  <circle cx="116" cy="362" r="16" fill="#222129" stroke="#bc8d6b" stroke-width="4"/>
+  <polygon points="164,122 404,96 432,354 192,382" fill="#2a2730" stroke="#5f5b7d" stroke-width="3"/>
+  <polygon points="180,104 418,128 390,400 150,374" fill="#363139" stroke="#a9aae2" stroke-width="4"/>
+  <polygon points="202,136 390,156 368,358 178,338" fill="#eee0ca" stroke="#bc8d6b" stroke-width="4"/>
+  <line x1="224" y1="188" x2="338" y2="200" stroke="#0c0b10" stroke-width="7" stroke-linecap="square"/>
+  <line x1="224" y1="224" x2="360" y2="236" stroke="#0c0b10" stroke-width="7" stroke-linecap="square"/>
+  <line x1="224" y1="260" x2="326" y2="272" stroke="#0c0b10" stroke-width="7" stroke-linecap="square"/>
+  <line x1="224" y1="296" x2="350" y2="308" stroke="#0c0b10" stroke-width="7" stroke-linecap="square"/>
+  <path d="M244 186 C204 188 196 214 204 232 C210 246 210 258 198 276" fill="none" stroke="#bc8d6b" stroke-width="12" stroke-linecap="square"/>
+  <path d="M346 204 C386 206 394 232 386 250 C380 264 380 276 392 294" fill="none" stroke="#bc8d6b" stroke-width="12" stroke-linecap="square"/>
+  <line x1="154" y1="418" x2="422" y2="418" stroke="#bc8d6b" stroke-width="14" stroke-linecap="square"/>
+  <line x1="184" y1="442" x2="392" y2="442" stroke="#a9aae2" stroke-width="8" stroke-linecap="square"/>
+</svg>
