@@ -1,0 +1,47 @@
+[package]
+name = "style_binder"
+version = "0.1.0"
+edition = "2021"
+description = "A modular CSS bundler and unbinder for Blogger, Tumblr, SpaceHey, and static web themes."
+repository = "https://github.com/MoribundMurdoch/style_binder"
+license = "MIT"
+
+[lib]
+name = "style_binder"
+path = "src/lib.rs"
+crate-type = ["rlib", "cdylib"]
+
+[[bin]]
+name = "style_binder"
+path = "src/main.rs"
+required-features = ["desktop"]
+
+[dependencies]
+# Desktop app dependencies.
+# These are optional so the Wasm build can stay pure and lightweight.
+floem = { version = "0.2.0", optional = true }
+notify = { version = "6.1.1", optional = true }
+walkdir = { version = "2.4.0", optional = true }
+copypasta = { version = "0.10.2", optional = true }
+
+# Future Wasm bindings.
+# These are optional so the desktop app and the Wasm package can be built separately.
+wasm-bindgen = { version = "0.2", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+serde-wasm-bindgen = { version = "0.6", optional = true }
+
+[features]
+default = ["desktop"]
+
+desktop = [
+    "dep:floem",
+    "dep:notify",
+    "dep:walkdir",
+    "dep:copypasta",
+]
+
+wasm = [
+    "dep:wasm-bindgen",
+    "dep:serde",
+    "dep:serde-wasm-bindgen",
+]
