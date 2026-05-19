@@ -8,6 +8,9 @@
 
 pub mod core;
 
+#[cfg(feature = "desktop")]
+pub mod settings;
+
 #[cfg(feature = "wasm")]
 pub mod wasm_api;
 

@@ -8,3 +8,6 @@
 .DS_Store
 *.swp
 *.swo
+
+# Local app settings
+/config.toml

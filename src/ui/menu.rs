@@ -1,6 +1,5 @@
 use crate::core::{CssModule, ExportMode};
 use crate::ui::dialogs::DialogKind;
-use crate::ui::tooltips::status_tip_fn;
 use crate::ui::helpers::{
     backup_overwritten_modules,
     clear_import_file,
@@ -18,9 +17,14 @@ use crate::ui::helpers::{
     STANDARD_EXPORT_FILE,
     TARGET_DIR,
 };
+use crate::ui::tooltips::status_tip_fn;
 use copypasta::{ClipboardContext, ClipboardProvider};
 use floem::peniko::Color;
 use floem::prelude::*;
+
+const ZOOM_MIN: f64 = 0.80;
+const ZOOM_MAX: f64 = 1.25;
+const ZOOM_STEP: f64 = 0.10;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum MenuKind {
@@ -38,6 +42,7 @@ pub fn app_menu_bar(
     status_message: RwSignal<String>,
     pending_modules: RwSignal<Vec<CssModule>>,
     active_dialog: RwSignal<Option<DialogKind>>,
+    workbench_zoom: RwSignal<f64>,
 ) -> impl IntoView {
     let active_menu = RwSignal::new(MenuKind::File);
 
@@ -62,6 +67,7 @@ pub fn app_menu_bar(
                 status_message,
                 pending_modules,
                 active_dialog,
+                workbench_zoom,
             ),
             command_button(
                 active_menu,
@@ -72,6 +78,7 @@ pub fn app_menu_bar(
                 status_message,
                 pending_modules,
                 active_dialog,
+                workbench_zoom,
             ),
             command_button(
                 active_menu,
@@ -82,6 +89,7 @@ pub fn app_menu_bar(
                 status_message,
                 pending_modules,
                 active_dialog,
+                workbench_zoom,
             ),
             command_button(
                 active_menu,
@@ -92,6 +100,7 @@ pub fn app_menu_bar(
                 status_message,
                 pending_modules,
                 active_dialog,
+                workbench_zoom,
             ),
             command_button(
                 active_menu,
@@ -102,6 +111,7 @@ pub fn app_menu_bar(
                 status_message,
                 pending_modules,
                 active_dialog,
+                workbench_zoom,
             ),
             command_button(
                 active_menu,
@@ -112,6 +122,29 @@ pub fn app_menu_bar(
                 status_message,
                 pending_modules,
                 active_dialog,
+                workbench_zoom,
+            ),
+            command_button(
+                active_menu,
+                6,
+                css_content,
+                export_mode,
+                file_tick,
+                status_message,
+                pending_modules,
+                active_dialog,
+                workbench_zoom,
+            ),
+            command_button(
+                active_menu,
+                7,
+                css_content,
+                export_mode,
+                file_tick,
+                status_message,
+                pending_modules,
+                active_dialog,
+                workbench_zoom,
             ),
         ))
         .style(|s| s.items_center()),
@@ -174,6 +207,7 @@ fn command_button(
     status_message: RwSignal<String>,
     pending_modules: RwSignal<Vec<CssModule>>,
     active_dialog: RwSignal<Option<DialogKind>>,
+    workbench_zoom: RwSignal<f64>,
 ) -> impl IntoView {
     status_tip_fn(
         label(move || command_label(active_menu.get(), index).to_string())
@@ -191,6 +225,7 @@ fn command_button(
                     status_message,
                     pending_modules,
                     active_dialog,
+                    workbench_zoom,
                 );
             })
             .style(move |s| {
@@ -249,12 +284,19 @@ fn command_label(menu: MenuKind, index: usize) -> &'static str {
 
         (MenuKind::View, 0) => "Plain CSS Bundle",
         (MenuKind::View, 1) => "Blogger Skin Wrapper",
+        (MenuKind::View, 2) => "Compact View",
+        (MenuKind::View, 3) => "Normal View",
+        (MenuKind::View, 4) => "Comfortable View",
+        (MenuKind::View, 5) => "Zoom Out",
+        (MenuKind::View, 6) => "Reset Zoom",
+        (MenuKind::View, 7) => "Zoom In",
 
         (MenuKind::Tools, 0) => "Inspect Import",
         (MenuKind::Tools, 1) => "Refactor into Sheets",
         (MenuKind::Tools, 2) => "Clear Pending Import",
         (MenuKind::Tools, 3) => "Open Refactored Folder",
         (MenuKind::Tools, 4) => "Clear import.css",
+        (MenuKind::Tools, 5) => "Settings",
 
         (MenuKind::Help, 0) => "Split Marker Help",
         (MenuKind::Help, 1) => "About",
@@ -277,12 +319,19 @@ fn command_tooltip(menu: MenuKind, index: usize) -> &'static str {
 
         (MenuKind::View, 0) => "Preview/export regular CSS without a Blogger wrapper.",
         (MenuKind::View, 1) => "Preview/export CSS inside a Blogger <b:skin><![CDATA[ ... ]]></b:skin> wrapper.",
+        (MenuKind::View, 2) => "Use a narrower workbench width for smaller screens.",
+        (MenuKind::View, 3) => "Return the workbench to the default width.",
+        (MenuKind::View, 4) => "Use a wider workbench width for roomy desktop layouts.",
+        (MenuKind::View, 5) => "Reduce the workbench width preset.",
+        (MenuKind::View, 6) => "Reset the workbench width preset to 100%.",
+        (MenuKind::View, 7) => "Increase the workbench width preset.",
 
         (MenuKind::Tools, 0) => "Scan import.css for split markers and preview the files to be written.",
         (MenuKind::Tools, 1) => "Write inspected sections into src_css/. Overwrites are backed up first.",
         (MenuKind::Tools, 2) => "Clear the in-memory import preview without changing import.css.",
         (MenuKind::Tools, 3) => "Open src_css/, where refactored sheets are written.",
         (MenuKind::Tools, 4) => "Empty import.css and clear any pending import preview.",
+        (MenuKind::Tools, 5) => "Open the settings dialog.",
 
         (MenuKind::Help, 0) => "Show the /* --- filename.css --- */ split marker format.",
         (MenuKind::Help, 1) => "Show app information.",
@@ -302,6 +351,7 @@ fn run_command(
     status_message: RwSignal<String>,
     pending_modules: RwSignal<Vec<CssModule>>,
     active_dialog: RwSignal<Option<DialogKind>>,
+    workbench_zoom: RwSignal<f64>,
 ) {
     match (menu, index) {
         (MenuKind::File, 0) => {
@@ -368,6 +418,18 @@ fn run_command(
             export_mode.set(ExportMode::BloggerXml);
             status_message.set("Switched to Blogger Skin wrapper mode.".to_string());
         }
+        (MenuKind::View, 2) => set_workbench_zoom(workbench_zoom, status_message, 0.90, "Compact View"),
+        (MenuKind::View, 3) => set_workbench_zoom(workbench_zoom, status_message, 1.00, "Normal View"),
+        (MenuKind::View, 4) => set_workbench_zoom(workbench_zoom, status_message, 1.10, "Comfortable View"),
+        (MenuKind::View, 5) => {
+            let next = (workbench_zoom.get() - ZOOM_STEP).max(ZOOM_MIN);
+            set_workbench_zoom(workbench_zoom, status_message, next, "Zoom Out");
+        }
+        (MenuKind::View, 6) => set_workbench_zoom(workbench_zoom, status_message, 1.00, "Reset Zoom"),
+        (MenuKind::View, 7) => {
+            let next = (workbench_zoom.get() + ZOOM_STEP).min(ZOOM_MAX);
+            set_workbench_zoom(workbench_zoom, status_message, next, "Zoom In");
+        }
 
         (MenuKind::Tools, 0) => {
             inspect_import_into_pending(status_message, pending_modules);
@@ -394,6 +456,10 @@ fn run_command(
             }
             Err(err) => status_message.set(format!("Could not clear import.css: {err}")),
         }
+        (MenuKind::Tools, 5) => {
+            active_dialog.set(Some(DialogKind::Settings));
+            status_message.set("Opened settings dialog.".to_string());
+        }
 
         (MenuKind::Help, 0) => {
             active_dialog.set(Some(DialogKind::SplitMarkerHelp));
@@ -410,6 +476,17 @@ fn run_command(
 
         _ => {}
     }
+}
+
+fn set_workbench_zoom(
+    workbench_zoom: RwSignal<f64>,
+    status_message: RwSignal<String>,
+    zoom: f64,
+    label: &'static str,
+) {
+    let zoom = zoom.clamp(ZOOM_MIN, ZOOM_MAX);
+    workbench_zoom.set(zoom);
+    status_message.set(format!("{label}: workbench width preset set to {:.0}%.", zoom * 100.0));
 }
 
 fn inspect_import_into_pending(
