@@ -5,17 +5,12 @@ use std::path::Path;
 
 pub const DEFAULT_CONFIG_FILE: &str = "./config.toml";
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum DefaultExportMode {
+    #[default]
     PlainCssBundle,
     BloggerSkinWrapper,
-}
-
-impl Default for DefaultExportMode {
-    fn default() -> Self {
-        Self::PlainCssBundle
-    }
 }
 
 impl DefaultExportMode {
@@ -124,7 +119,10 @@ mod tests {
         let settings = AppSettings::default();
 
         assert!(settings.confirm_before_overwriting_sheets);
-        assert_eq!(settings.default_export_mode, DefaultExportMode::PlainCssBundle);
+        assert_eq!(
+            settings.default_export_mode,
+            DefaultExportMode::PlainCssBundle
+        );
         assert_eq!(settings.preview_font_size, 14.0);
         assert!(settings.remember_window_size);
         assert!(settings.auto_inspect_import_after_drop);

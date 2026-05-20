@@ -14,12 +14,7 @@ pub mod settings;
 #[cfg(feature = "wasm")]
 pub mod wasm_api;
 
-pub use crate::core::{
-    build_bundle_from_modules,
-    unbind_bundle_to_modules,
-    CssModule,
-    ExportMode,
-};
+pub use crate::core::{build_bundle_from_modules, unbind_bundle_to_modules, CssModule, ExportMode};
 
 /// Convenience wrapper for Standard CSS output.
 ///
@@ -68,10 +63,8 @@ mod tests {
     fn builds_blogger_xml_bundle_from_modules() {
         let modules = vec![CssModule::new("01_base.css", "body { margin: 0; }")];
 
-        let bundle = build_blogger_xml_bundle(
-            &modules,
-            Some("<Variable name=\"body.background\"/>"),
-        );
+        let bundle =
+            build_blogger_xml_bundle(&modules, Some("<Variable name=\"body.background\"/>"));
 
         assert!(bundle.contains("<b:skin>"));
         assert!(bundle.contains("<![CDATA["));

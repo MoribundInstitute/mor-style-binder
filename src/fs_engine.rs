@@ -34,7 +34,7 @@ fn read_css_modules_from_dir(dir: &Path) -> Vec<CssModule> {
         .into_iter()
         .filter_map(|entry| entry.ok())
         .filter(|entry| entry.path().is_file())
-        .filter(|entry| entry.path().extension().map_or(false, |ext| ext == "css"))
+        .filter(|entry| entry.path().extension().is_some_and(|ext| ext == "css"))
         .map(|entry| entry.path().to_owned())
         .collect();
 

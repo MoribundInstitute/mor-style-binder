@@ -1,0 +1,27 @@
+:root {
+  /* Terminal Palette */
+  --bg-base: #0a0a0a;
+  --bg-panel: #111111;
+  --bg-highlight: #1a1a1a;
+  --bg-soft: #151515;
+  --bg-elevated: #101010;
+
+  --fg-base: #e0e0e0;
+  --fg-dim: #888888;
+  --fg-muted: #666666;
+
+  --border-color: #333333;
+  --border-soft: #242424;
+
+  --font-mono: 'Courier New', Courier, monospace;
+
+  --sidebar-width: 300px;
+  --header-z: 1100;
+  --overlay-z: 1200;
+  --dropdown-z: 1300;
+
+  --glow: 0 0 4px rgba(224, 224, 224, 0.35);
+  --glow-strong: 0 0 8px rgba(255, 255, 255, 0.6);
+  --shadow-elevated: 0 18px 45px rgba(0, 0, 0, 0.65);
+}
+

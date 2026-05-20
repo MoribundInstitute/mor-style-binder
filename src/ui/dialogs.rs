@@ -1,9 +1,5 @@
 use crate::core::ExportMode;
-use crate::settings::{
-    save_settings,
-    AppSettings,
-    DEFAULT_CONFIG_FILE,
-};
+use crate::settings::{save_settings, AppSettings, DEFAULT_CONFIG_FILE};
 use floem::peniko::Color;
 use floem::prelude::*;
 
@@ -28,7 +24,6 @@ pub fn dialog_layer(
                     .color(Color::rgb8(230, 230, 230))
                     .margin_right(12.0)
             }),
-
             label(|| "Close".to_string())
                 .on_click_stop(move |_| active_dialog.set(None))
                 .style(move |s| {
@@ -53,9 +48,9 @@ pub fn dialog_layer(
                 }),
         ))
         .style(|s| s.items_center().margin_bottom(8.0)),
-
         label(move || dialog_body(active_dialog.get()).to_string()).style(move |s| {
-            let hidden = active_dialog.get().is_none() || active_dialog.get() == Some(DialogKind::Settings);
+            let hidden =
+                active_dialog.get().is_none() || active_dialog.get() == Some(DialogKind::Settings);
 
             s.font_size(13.0)
                 .line_height(1.45)
@@ -66,7 +61,6 @@ pub fn dialog_layer(
                 })
                 .apply_if(!hidden, |s| s.color(Color::rgb8(180, 180, 180)))
         }),
-
         settings_dialog(active_dialog, app_settings, export_mode, status_message),
     ))
     .style(move |s| {
@@ -103,39 +97,32 @@ fn settings_dialog(
                 .margin_bottom(10.0)
                 .color(Color::rgb8(170, 170, 170))
         }),
-
         bool_setting_row(
             "Confirm before overwriting sheets",
             app_settings,
             |settings| settings.confirm_before_overwriting_sheets,
             |settings, value| settings.confirm_before_overwriting_sheets = value,
         ),
-
         export_mode_setting_row(app_settings, export_mode),
-
         font_size_setting_row(app_settings),
-
         bool_setting_row(
             "Remember window size",
             app_settings,
             |settings| settings.remember_window_size,
             |settings, value| settings.remember_window_size = value,
         ),
-
         bool_setting_row(
             "Auto-inspect import.css after drop",
             app_settings,
             |settings| settings.auto_inspect_import_after_drop,
             |settings, value| settings.auto_inspect_import_after_drop = value,
         ),
-
         bool_setting_row(
             "Show verbose status messages",
             app_settings,
             |settings| settings.show_verbose_status_messages,
             |settings, value| settings.show_verbose_status_messages = value,
         ),
-
         h_stack((
             label(|| "Save Settings".to_string())
                 .on_click_stop(move |_| {
@@ -152,7 +139,6 @@ fn settings_dialog(
                     }
                 })
                 .style(action_button_style),
-
             label(|| "Close".to_string())
                 .on_click_stop(move |_| active_dialog.set(None))
                 .style(action_button_style),
@@ -169,8 +155,7 @@ fn settings_dialog(
                 .color(Color::rgb8(15, 15, 15))
         })
         .apply_if(!hidden, |s| {
-            s.padding(4.0)
-                .color(Color::rgb8(180, 180, 180))
+            s.padding(4.0).color(Color::rgb8(180, 180, 180))
         })
     })
 }
@@ -187,7 +172,6 @@ fn bool_setting_row(
                 .font_size(13.0)
                 .color(Color::rgb8(190, 190, 190))
         }),
-
         label(move || {
             let value = getter(&app_settings.get());
             if value {
@@ -217,7 +201,6 @@ fn export_mode_setting_row(
                 .font_size(13.0)
                 .color(Color::rgb8(190, 190, 190))
         }),
-
         label(move || app_settings.get().default_export_mode.label().to_string())
             .on_click_stop(move |_| {
                 app_settings.update(|settings| {
@@ -237,7 +220,6 @@ fn font_size_setting_row(app_settings: RwSignal<AppSettings>) -> impl IntoView {
                 .font_size(13.0)
                 .color(Color::rgb8(190, 190, 190))
         }),
-
         label(|| "-".to_string())
             .on_click_stop(move |_| {
                 app_settings.update(|settings| {
@@ -245,13 +227,11 @@ fn font_size_setting_row(app_settings: RwSignal<AppSettings>) -> impl IntoView {
                 });
             })
             .style(action_button_style),
-
         label(move || format!("{:.0}px", app_settings.get().preview_font_size)).style(|s| {
             s.width(70.0)
                 .font_size(13.0)
                 .color(Color::rgb8(220, 220, 220))
         }),
-
         label(|| "+".to_string())
             .on_click_stop(move |_| {
                 app_settings.update(|settings| {

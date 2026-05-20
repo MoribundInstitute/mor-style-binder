@@ -1,0 +1,203 @@
+
+@media screen and (max-width: 900px) {
+  :root {
+    --sidebar-width: min(320px, 86vw);
+  }
+
+  html,
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  body {
+    display: block;
+  }
+
+  .terminal-main-header {
+    position: sticky;
+    top: 0;
+  }
+
+  .header-top-row {
+    min-height: 44px;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .institute-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+  }
+
+  .branding .institute-title {
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    max-width: 46vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .panel-toggle {
+    min-width: auto;
+    font-size: 0.8rem;
+    padding: 4px 6px;
+  }
+
+  .header-bottom-row {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .terminal-nav {
+    width: 100%;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding-bottom: 2px;
+  }
+
+  .terminal-nav a,
+  .terminal-nav button {
+    font-size: 0.85rem;
+  }
+
+  .mor-catalog-menu {
+    position: static;
+  }
+
+.mor-catalog-dropdown {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  top: 150px;
+  z-index: var(--dropdown-z);
+  grid-template-columns: 1fr;
+  width: auto;
+  max-height: calc(100vh - 170px);
+}
+
+  .mor-catalog-left {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-color);
+    max-height: 32vh;
+  }
+
+  .mor-catalog-right {
+    max-height: 40vh;
+  }
+
+  .terminal-search {
+    width: 100%;
+  }
+
+  .terminal-search form {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .terminal-search .prompt {
+    display: none;
+  }
+
+  .terminal-search input {
+    width: 100%;
+    flex: 1;
+  }
+
+  .terminal-search input:focus {
+    width: 100%;
+  }
+
+  .terminal-workspace {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .canvas-core {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .canvas-content {
+    padding: 16px 12px;
+    max-width: none;
+  }
+
+  .post-title {
+    font-size: 1.25rem;
+  }
+
+  .runelite-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    min-width: 0;
+    height: 100vh;
+    z-index: var(--overlay-z);
+    box-shadow: 2px 0 14px rgba(0, 0, 0, 0.65);
+    margin: 0;
+  }
+
+  .panel-left {
+    left: 0;
+    right: auto;
+    border-right: 1px solid var(--border-color);
+  }
+
+  .panel-right {
+    right: 0;
+    left: auto;
+    border-left: 1px solid var(--border-color);
+  }
+
+  .panel-left.is-collapsed {
+    margin-left: 0;
+    transform: translateX(-100%);
+  }
+
+  .panel-right.is-collapsed {
+    margin-right: 0;
+    transform: translateX(100%);
+  }
+
+  .panel-left:not(.is-collapsed),
+  .panel-right:not(.is-collapsed) {
+    transform: translateX(0);
+  }
+
+  .panel-content {
+    padding: 14px;
+  }
+
+  .sidebar-section .Label ul {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-section .widget-content {
+    max-height: 45vh;
+  }
+
+  .terminal-footer {
+    margin-top: 40px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .footer-sys-info {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+

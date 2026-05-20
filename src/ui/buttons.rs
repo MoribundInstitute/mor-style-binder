@@ -1,7 +1,8 @@
 use floem::peniko::Color;
 
 pub fn action_button_primary(s: floem::style::Style) -> floem::style::Style {
-    s.padding_horiz(14.0)
+    s.width(260.0)
+        .padding_horiz(14.0)
         .padding_vert(7.0)
         .margin_bottom(8.0)
         .border(1.0)
@@ -13,7 +14,8 @@ pub fn action_button_primary(s: floem::style::Style) -> floem::style::Style {
 }
 
 pub fn action_button_secondary(s: floem::style::Style) -> floem::style::Style {
-    s.padding_horiz(14.0)
+    s.width(260.0)
+        .padding_horiz(14.0)
         .padding_vert(7.0)
         .margin_bottom(8.0)
         .border(1.0)

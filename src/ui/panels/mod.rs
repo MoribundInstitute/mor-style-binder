@@ -34,7 +34,7 @@ pub fn import_export_panel(
     ))
     .style(panel_style)
     .on_event_stop(EventListener::DroppedFile, move |event| {
-        import_theme::handle_theme_drop(&event, status_message, pending_modules);
+        import_theme::handle_theme_drop(event, status_message, pending_modules);
     })
 }
 

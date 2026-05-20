@@ -15,23 +15,29 @@ pub fn bundle_preview_panel(
                 .margin_bottom(8.0)
                 .color(Color::rgb8(145, 145, 145))
         }),
-        scroll(
-            label(move || css_content.get()).style(move |s| {
-                let font_size = app_settings.get().preview_font_size;
+        scroll(label(move || css_content.get()).style(move |s| {
+            let font_size = app_settings.get().preview_font_size;
 
-                s.font_family("monospace".to_string())
-                    .font_size(font_size)
-                    .line_height(1.5)
-                    .color(Color::rgb8(185, 185, 185))
-            }),
-        )
+            s.font_family("monospace".to_string())
+                .font_size(font_size)
+                .line_height(1.5)
+                .color(Color::rgb8(185, 185, 185))
+                .width_full()
+        }))
         .style(|s| {
-            s.size_full()
+            s.width_full()
+                .height_full()
                 .padding(15.0)
                 .border(1.0)
                 .border_radius(4.0)
                 .border_color(Color::rgb8(45, 45, 45))
                 .background(Color::rgb8(3, 3, 3))
+                // Fixed: Split min_size into width and height
+                .min_width(0.0)
+                .min_height(0.0)
+                .flex_basis(0.0)
+                .flex_grow(1.0)
+            // Fixed: Removed invalid overflow_clip()
         }),
     ))
     .style(|s| panel_style(s).width(780.0).height(620.0))

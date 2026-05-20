@@ -110,11 +110,7 @@ fn css_drop_zone(file_tick: RwSignal<u32>, status_message: RwSignal<String>) -> 
     })
 }
 
-fn handle_css_drop(
-    event: &Event,
-    file_tick: RwSignal<u32>,
-    status_message: RwSignal<String>,
-) {
+fn handle_css_drop(event: &Event, file_tick: RwSignal<u32>, status_message: RwSignal<String>) {
     let Event::DroppedFile(dropped) = event else {
         return;
     };

@@ -6,17 +6,13 @@ mod ui;
 use crate::core::CssModule;
 use crate::ui::helpers::{read_css_module_names, TARGET_DIR};
 use crate::ui::{
-    app_header,
-    app_menu_bar,
-    bundle_preview_panel,
-    dialog_layer,
-    import_export_panel,
-    module_tray_panel,
-    status_strip,
+    app_header, app_menu_bar, bundle_preview_panel, dialog_layer, import_export_panel,
+    module_tray_panel, status_strip,
 };
 use floem::peniko::Color;
 use floem::prelude::*;
 use floem::reactive::create_effect;
+use floem::views::img;
 use floem::window::WindowConfig;
 use floem::Application;
 use notify::{RecursiveMode, Watcher};
@@ -87,56 +83,68 @@ fn app_view() -> impl IntoView {
     });
 
     scroll(
-        v_stack((
-            app_menu_bar(
-                css_content,
-                export_mode,
-                file_tick,
-                status_message,
-                pending_modules,
-                active_dialog,
-                workbench_zoom,
-            ),
-
-            app_header(export_mode, status_message),
-
-            status_strip(status_message),
-
-            dialog_layer(active_dialog, app_settings, export_mode, status_message),
-
-            h_stack((
-                module_tray_panel(
-                    module_count,
-                    module_names,
-                    blogger_vars_detected,
-                    status_message,
-                    file_tick,
-                ),
-
-                bundle_preview_panel(css_content, app_settings),
-
-                import_export_panel(
+        container(
+            v_stack((
+                app_menu_bar(
                     css_content,
                     export_mode,
                     file_tick,
                     status_message,
                     pending_modules,
+                    active_dialog,
+                    workbench_zoom,
                 ),
+                app_header(export_mode, status_message),
+                status_strip(status_message),
+                container(
+                    img(move || std::fs::read("BindersMeme.jpg").unwrap_or_default()).style(|s| {
+                        s.width(260.0)
+                            .height(145.0)
+                            .border_radius(4.0)
+                            .border(1.0)
+                            .border_color(Color::rgb8(55, 55, 55))
+                    }),
+                )
+                .style(|s| {
+                    s.width_full()
+                        .justify_center()
+                        .margin_top(6.0)
+                        .margin_bottom(10.0)
+                }),
+                dialog_layer(active_dialog, app_settings, export_mode, status_message),
+                h_stack((
+                    module_tray_panel(
+                        module_count,
+                        module_names,
+                        blogger_vars_detected,
+                        status_message,
+                        file_tick,
+                    ),
+                    bundle_preview_panel(css_content, app_settings),
+                    import_export_panel(
+                        css_content,
+                        export_mode,
+                        file_tick,
+                        status_message,
+                        pending_modules,
+                    ),
+                ))
+                .style(|s| s.items_start()),
             ))
-            .style(|s| s.items_start()),
-        ))
-        .style(move |s| {
-            let zoom = workbench_zoom.get();
+            .style(move |s| {
+                let zoom = workbench_zoom.get();
 
-            s.min_width(WORKBENCH_BASE_WIDTH * zoom)
-                .padding(WORKBENCH_BASE_PADDING)
+                s.min_width(WORKBENCH_BASE_WIDTH * zoom)
+                    .padding(WORKBENCH_BASE_PADDING)
+            }),
+        )
+        .style(|s| {
+            s.width_full()
+                .justify_center()
                 .background(Color::rgb8(15, 15, 15))
         }),
     )
-    .style(|s| {
-        s.size_full()
-            .background(Color::rgb8(15, 15, 15))
-    })
+    .style(|s| s.size_full().background(Color::rgb8(15, 15, 15)))
 }
 
 fn main() {

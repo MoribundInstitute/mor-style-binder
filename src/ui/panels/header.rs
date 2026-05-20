@@ -2,6 +2,7 @@ use crate::core::ExportMode;
 use crate::ui::tooltips::status_tip;
 use floem::peniko::Color;
 use floem::prelude::*;
+use floem::views::svg;
 
 pub fn mode_selector(
     export_mode: RwSignal<ExportMode>,
@@ -60,21 +61,50 @@ pub fn app_header(
     status_message: RwSignal<String>,
 ) -> impl IntoView {
     v_stack((
-        label(|| "MorStyleBinder".to_string()).style(|s| {
-            s.font_size(26.0)
-                .margin_bottom(8.0)
-                .color(Color::rgb8(225, 225, 225))
-        }),
-        label(|| {
-            "Bind modular CSS sheets into one theme, or refactor a monolithic theme into modular files."
-                .to_string()
-        })
-        .style(|s| {
-            s.font_size(13.0)
-                .margin_bottom(14.0)
-                .color(Color::rgb8(145, 145, 145))
-        }),
-        mode_selector(export_mode, status_message),
+        h_stack((
+            svg(
+                std::fs::read_to_string("MorStyleBinder.svg")
+                    .unwrap_or_default()
+                    .replace("#000000", "currentColor")
+                    .replace("#000", "currentColor")
+                    .replace("#FFFFFF", "currentColor")
+                    .replace("#FFF", "currentColor")
+                    .replace("black", "currentColor")
+                    .replace("white", "currentColor")
+            )
+            .style(|s| {
+                s.width(190.0)
+                    .height(72.0)
+                    .margin_right(22.0)
+                    // Natively tints the 'currentColor' SVG to match the UI text
+                    .color(Color::rgb8(235, 235, 235))
+            }),
+            v_stack((
+                label(|| "MorStyleBinder".to_string()).style(|s| {
+                    s.font_size(26.0)
+                        .margin_bottom(8.0)
+                        .color(Color::rgb8(225, 225, 225))
+                }),
+                label(|| {
+                    "Bind modular CSS sheets into one theme, or refactor a monolithic theme into modular files."
+                        .to_string()
+                })
+                .style(|s| {
+                    s.font_size(13.0)
+                        .margin_bottom(14.0)
+                        .color(Color::rgb8(145, 145, 145))
+                }),
+                mode_selector(export_mode, status_message),
+            )),
+        ))
+        .style(|s| s.items_center()),
     ))
-    .style(|s| s.margin_bottom(14.0))
+    .style(|s| {
+        s.margin_bottom(14.0)
+            .padding(14.0)
+            .border(1.0)
+            .border_radius(4.0)
+            .border_color(Color::rgb8(45, 45, 45))
+            .background(Color::rgb8(18, 18, 18))
+    })
 }

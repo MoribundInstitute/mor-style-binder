@@ -20,11 +20,7 @@ where
 ///
 /// This is useful for menu command rows, where the visible command changes
 /// when File/Edit/View/Tools/Help changes.
-pub fn status_tip_fn<V, F>(
-    child: V,
-    status_message: RwSignal<String>,
-    tip_text: F,
-) -> impl IntoView
+pub fn status_tip_fn<V, F>(child: V, status_message: RwSignal<String>, tip_text: F) -> impl IntoView
 where
     V: IntoView + 'static,
     F: Fn() -> &'static str + Copy + 'static,

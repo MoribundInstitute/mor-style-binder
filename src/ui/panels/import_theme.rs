@@ -173,7 +173,7 @@ fn theme_drop_zone(
     })
     .on_event_stop(EventListener::DroppedFile, move |event| {
         is_hovered.set(false);
-        handle_theme_drop(&event, status_message, pending_modules);
+        handle_theme_drop(event, status_message, pending_modules);
     })
 }
 
@@ -213,7 +213,9 @@ pub(super) fn handle_theme_drop(
             }
         }
         Err(err) => {
-            status_message.set(format!("Unsupported theme file type or import error: {err}"));
+            status_message.set(format!(
+                "Unsupported theme file type or import error: {err}"
+            ));
         }
     }
 }
@@ -268,8 +270,9 @@ pub(super) fn refactor_pending_or_import(
                 let count = report.detected_modules.len();
 
                 if count == 0 {
-                    status_message
-                        .set("No split markers found in import.css. Nothing to refactor.".to_string());
+                    status_message.set(
+                        "No split markers found in import.css. Nothing to refactor.".to_string(),
+                    );
                     return;
                 }
 
@@ -317,8 +320,9 @@ pub(super) fn refactor_pending_or_import(
             pending_modules.set(Vec::new());
 
             if overwrites.is_empty() {
-                status_message
-                    .set(format!("Refactored {count} sheet(s). Open Refactored Folder to view them."));
+                status_message.set(format!(
+                    "Refactored {count} sheet(s). Open Refactored Folder to view them."
+                ));
             } else {
                 status_message.set(format!(
                     "Refactored {count} sheet(s); overwrote: {}; {} Open Refactored Folder to view them.",

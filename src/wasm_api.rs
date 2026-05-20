@@ -7,12 +7,7 @@
 
 #![cfg(feature = "wasm")]
 
-use crate::core::{
-    build_bundle_from_modules,
-    unbind_bundle_to_modules,
-    CssModule,
-    ExportMode,
-};
+use crate::core::{build_bundle_from_modules, unbind_bundle_to_modules, CssModule, ExportMode};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -49,10 +44,7 @@ impl From<CssModule> for WasmCssModule {
 pub fn wasm_build_standard_bundle(modules: JsValue) -> Result<String, JsValue> {
     let wasm_modules: Vec<WasmCssModule> = serde_wasm_bindgen::from_value(modules)?;
 
-    let core_modules: Vec<CssModule> = wasm_modules
-        .into_iter()
-        .map(CssModule::from)
-        .collect();
+    let core_modules: Vec<CssModule> = wasm_modules.into_iter().map(CssModule::from).collect();
 
     Ok(build_bundle_from_modules(
         &core_modules,
@@ -72,10 +64,7 @@ pub fn wasm_build_blogger_xml_bundle(
 ) -> Result<String, JsValue> {
     let wasm_modules: Vec<WasmCssModule> = serde_wasm_bindgen::from_value(modules)?;
 
-    let core_modules: Vec<CssModule> = wasm_modules
-        .into_iter()
-        .map(CssModule::from)
-        .collect();
+    let core_modules: Vec<CssModule> = wasm_modules.into_iter().map(CssModule::from).collect();
 
     Ok(build_bundle_from_modules(
         &core_modules,

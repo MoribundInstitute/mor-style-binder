@@ -1,22 +1,11 @@
 use crate::core::{CssModule, ExportMode};
 use crate::ui::dialogs::DialogKind;
 use crate::ui::helpers::{
-    backup_overwritten_modules,
-    clear_import_file,
-    ensure_import_file_exists,
-    inspect_import_file,
-    open_path,
-    save_bundle_to_file,
-    summarize_module_names,
-    write_modules_to_dir,
-    BackupReport,
-    BACKUP_DIR,
-    BLOGGER_EXPORT_FILE,
-    IMPORT_FILE,
-    PROJECT_ROOT,
-    STANDARD_EXPORT_FILE,
-    TARGET_DIR,
+    backup_overwritten_modules, clear_import_file, ensure_import_file_exists, inspect_import_file,
+    open_path, save_bundle_to_file, summarize_module_names, write_modules_to_dir, BackupReport,
+    BACKUP_DIR, BLOGGER_EXPORT_FILE, IMPORT_FILE, PROJECT_ROOT, STANDARD_EXPORT_FILE, TARGET_DIR,
 };
+use crate::ui::icons::{ICON_COPY, ICON_FILE, ICON_FOLDER, ICON_REFACTOR, ICON_SAVE};
 use crate::ui::tooltips::status_tip_fn;
 use copypasta::{ClipboardContext, ClipboardProvider};
 use floem::peniko::Color;
@@ -35,6 +24,17 @@ enum MenuKind {
     Help,
 }
 
+#[derive(Clone, Copy)]
+pub struct MenuContext {
+    pub css_content: RwSignal<String>,
+    pub export_mode: RwSignal<ExportMode>,
+    pub file_tick: RwSignal<u32>,
+    pub status_message: RwSignal<String>,
+    pub pending_modules: RwSignal<Vec<CssModule>>,
+    pub active_dialog: RwSignal<Option<DialogKind>>,
+    pub workbench_zoom: RwSignal<f64>,
+}
+
 pub fn app_menu_bar(
     css_content: RwSignal<String>,
     export_mode: RwSignal<ExportMode>,
@@ -46,6 +46,16 @@ pub fn app_menu_bar(
 ) -> impl IntoView {
     let active_menu = RwSignal::new(MenuKind::File);
 
+    let ctx = MenuContext {
+        css_content,
+        export_mode,
+        file_tick,
+        status_message,
+        pending_modules,
+        active_dialog,
+        workbench_zoom,
+    };
+
     v_stack((
         h_stack((
             menu_heading("File", MenuKind::File, active_menu),
@@ -55,97 +65,16 @@ pub fn app_menu_bar(
             menu_heading("Help", MenuKind::Help, active_menu),
         ))
         .style(|s| s.items_center().margin_bottom(6.0)),
-
         h_stack((
             active_menu_label(active_menu),
-            command_button(
-                active_menu,
-                0,
-                css_content,
-                export_mode,
-                file_tick,
-                status_message,
-                pending_modules,
-                active_dialog,
-                workbench_zoom,
-            ),
-            command_button(
-                active_menu,
-                1,
-                css_content,
-                export_mode,
-                file_tick,
-                status_message,
-                pending_modules,
-                active_dialog,
-                workbench_zoom,
-            ),
-            command_button(
-                active_menu,
-                2,
-                css_content,
-                export_mode,
-                file_tick,
-                status_message,
-                pending_modules,
-                active_dialog,
-                workbench_zoom,
-            ),
-            command_button(
-                active_menu,
-                3,
-                css_content,
-                export_mode,
-                file_tick,
-                status_message,
-                pending_modules,
-                active_dialog,
-                workbench_zoom,
-            ),
-            command_button(
-                active_menu,
-                4,
-                css_content,
-                export_mode,
-                file_tick,
-                status_message,
-                pending_modules,
-                active_dialog,
-                workbench_zoom,
-            ),
-            command_button(
-                active_menu,
-                5,
-                css_content,
-                export_mode,
-                file_tick,
-                status_message,
-                pending_modules,
-                active_dialog,
-                workbench_zoom,
-            ),
-            command_button(
-                active_menu,
-                6,
-                css_content,
-                export_mode,
-                file_tick,
-                status_message,
-                pending_modules,
-                active_dialog,
-                workbench_zoom,
-            ),
-            command_button(
-                active_menu,
-                7,
-                css_content,
-                export_mode,
-                file_tick,
-                status_message,
-                pending_modules,
-                active_dialog,
-                workbench_zoom,
-            ),
+            command_button(active_menu, 0, ctx),
+            command_button(active_menu, 1, ctx),
+            command_button(active_menu, 2, ctx),
+            command_button(active_menu, 3, ctx),
+            command_button(active_menu, 4, ctx),
+            command_button(active_menu, 5, ctx),
+            command_button(active_menu, 6, ctx),
+            command_button(active_menu, 7, ctx),
         ))
         .style(|s| s.items_center()),
     ))
@@ -201,63 +130,71 @@ fn menu_heading(
 fn command_button(
     active_menu: RwSignal<MenuKind>,
     index: usize,
-    css_content: RwSignal<String>,
-    export_mode: RwSignal<ExportMode>,
-    file_tick: RwSignal<u32>,
-    status_message: RwSignal<String>,
-    pending_modules: RwSignal<Vec<CssModule>>,
-    active_dialog: RwSignal<Option<DialogKind>>,
-    workbench_zoom: RwSignal<f64>,
+    ctx: MenuContext,
 ) -> impl IntoView {
     status_tip_fn(
-        label(move || command_label(active_menu.get(), index).to_string())
-            .on_click_stop(move |_| {
-                if command_label(active_menu.get(), index).is_empty() {
-                    return;
-                }
+        h_stack((
+            // Dynamic SVG placement
+            create_icon_view(active_menu, index),
+            label(move || command_label(active_menu.get(), index).to_string())
+                .style(|s| s.font_size(12.0)),
+        ))
+        .on_click_stop(move |_| {
+            if command_label(active_menu.get(), index).is_empty() {
+                return;
+            }
+            run_command(active_menu.get(), index, ctx);
+        })
+        .style(move |s| {
+            let hidden = command_label(active_menu.get(), index).is_empty();
 
-                run_command(
-                    active_menu.get(),
-                    index,
-                    css_content,
-                    export_mode,
-                    file_tick,
-                    status_message,
-                    pending_modules,
-                    active_dialog,
-                    workbench_zoom,
-                );
-            })
-            .style(move |s| {
-                let hidden = command_label(active_menu.get(), index).is_empty();
-
-                s.padding_horiz(10.0)
-                    .padding_vert(5.0)
-                    .margin_right(5.0)
-                    .border(1.0)
-                    .border_radius(3.0)
-                    .font_size(12.0)
-                    .apply_if(hidden, |s| {
-                        s.width(0.0)
-                            .height(0.0)
-                            .padding(0.0)
-                            .margin_right(0.0)
-                            .border(0.0)
-                            .color(Color::rgb8(8, 8, 8))
-                            .background(Color::rgb8(8, 8, 8))
-                    })
-                    .apply_if(!hidden, |s| {
-                        s.border_color(Color::rgb8(60, 60, 60))
-                            .background(Color::rgb8(18, 18, 18))
-                            .color(Color::rgb8(190, 190, 190))
-                            .active(|s| {
-                                s.background(Color::rgb8(42, 42, 42))
-                                    .border_color(Color::rgb8(110, 110, 110))
-                            })
-                    })
-            }),
-        status_message,
+            s.padding_horiz(10.0)
+                .padding_vert(5.0)
+                .margin_right(5.0)
+                .border(1.0)
+                .border_radius(3.0)
+                .items_center()
+                .apply_if(hidden, |s| {
+                    s.width(0.0)
+                        .height(0.0)
+                        .padding(0.0)
+                        .margin_right(0.0)
+                        .border(0.0)
+                        .color(Color::rgb8(8, 8, 8))
+                        .background(Color::rgb8(8, 8, 8))
+                })
+                .apply_if(!hidden, |s| {
+                    s.border_color(Color::rgb8(60, 60, 60))
+                        .background(Color::rgb8(18, 18, 18))
+                        .color(Color::rgb8(190, 190, 190))
+                        .active(|s| {
+                            s.background(Color::rgb8(42, 42, 42))
+                                .border_color(Color::rgb8(110, 110, 110))
+                        })
+                })
+        }),
+        ctx.status_message,
         move || command_tooltip(active_menu.get(), index),
+    )
+}
+
+fn create_icon_view(active_menu: RwSignal<MenuKind>, index: usize) -> impl IntoView {
+    dyn_container(
+        move || command_icon(active_menu.get(), index),
+        |icon_opt| {
+            if let Some(icon_str) = icon_opt {
+                svg(icon_str.to_string())
+                    .style(|s| {
+                        s.width(14.0)
+                            .height(14.0)
+                            .color(Color::rgb8(160, 160, 160))
+                            .margin_right(6.0)
+                    })
+                    .into_any()
+            } else {
+                empty().into_any()
+            }
+        },
     )
 }
 
@@ -268,6 +205,24 @@ fn menu_name(menu: MenuKind) -> &'static str {
         MenuKind::View => "View",
         MenuKind::Tools => "Tools",
         MenuKind::Help => "Help",
+    }
+}
+
+fn command_icon(menu: MenuKind, index: usize) -> Option<&'static str> {
+    match (menu, index) {
+        (MenuKind::File, 0) => Some(ICON_FOLDER),
+        (MenuKind::File, 1) => Some(ICON_FILE),
+        (MenuKind::File, 2) => Some(ICON_SAVE),
+        (MenuKind::File, 3) => Some(ICON_SAVE),
+        (MenuKind::File, 4) => Some(ICON_FOLDER),
+
+        (MenuKind::Edit, 0) => Some(ICON_COPY),
+
+        (MenuKind::Tools, 0) => Some(ICON_FILE),
+        (MenuKind::Tools, 1) => Some(ICON_REFACTOR),
+        (MenuKind::Tools, 3) => Some(ICON_FOLDER),
+        (MenuKind::Tools, 4) => Some(ICON_FILE),
+        _ => None,
     }
 }
 
@@ -312,13 +267,17 @@ fn command_tooltip(menu: MenuKind, index: usize) -> &'static str {
         (MenuKind::File, 1) => "Open the import inbox file for monolithic themes.",
         (MenuKind::File, 2) => "Write the current plain CSS bundle to ./bundle.css.",
         (MenuKind::File, 3) => "Write the current bundle wrapped as Blogger <b:skin> XML.",
-        (MenuKind::File, 4) => "Open the project folder containing bundle.css and blogger-theme.xml.",
-        (MenuKind::File, 5) => "Placeholder for a future quit action.",
+        (MenuKind::File, 4) => {
+            "Open the project folder containing bundle.css and blogger-theme.xml."
+        }
+        (MenuKind::File, 5) => "Close the application and terminate the file watcher.",
 
         (MenuKind::Edit, 0) => "Copy the generated bundle preview to the clipboard.",
 
         (MenuKind::View, 0) => "Preview/export regular CSS without a Blogger wrapper.",
-        (MenuKind::View, 1) => "Preview/export CSS inside a Blogger <b:skin><![CDATA[ ... ]]></b:skin> wrapper.",
+        (MenuKind::View, 1) => {
+            "Preview/export CSS inside a Blogger <b:skin><![CDATA[ ... ]]></b:skin> wrapper."
+        }
         (MenuKind::View, 2) => "Use a narrower workbench width for smaller screens.",
         (MenuKind::View, 3) => "Return the workbench to the default width.",
         (MenuKind::View, 4) => "Use a wider workbench width for roomy desktop layouts.",
@@ -326,8 +285,12 @@ fn command_tooltip(menu: MenuKind, index: usize) -> &'static str {
         (MenuKind::View, 6) => "Reset the workbench width preset to 100%.",
         (MenuKind::View, 7) => "Increase the workbench width preset.",
 
-        (MenuKind::Tools, 0) => "Scan import.css for split markers and preview the files to be written.",
-        (MenuKind::Tools, 1) => "Write inspected sections into src_css/. Overwrites are backed up first.",
+        (MenuKind::Tools, 0) => {
+            "Scan import.css for split markers and preview the files to be written."
+        }
+        (MenuKind::Tools, 1) => {
+            "Write inspected sections into src_css/. Overwrites are backed up first."
+        }
         (MenuKind::Tools, 2) => "Clear the in-memory import preview without changing import.css.",
         (MenuKind::Tools, 3) => "Open src_css/, where refactored sheets are written.",
         (MenuKind::Tools, 4) => "Empty import.css and clear any pending import preview.",
@@ -341,18 +304,17 @@ fn command_tooltip(menu: MenuKind, index: usize) -> &'static str {
     }
 }
 
+fn run_command(menu: MenuKind, index: usize, ctx: MenuContext) {
+    let MenuContext {
+        css_content,
+        export_mode,
+        file_tick,
+        status_message,
+        pending_modules,
+        active_dialog,
+        workbench_zoom,
+    } = ctx;
 
-fn run_command(
-    menu: MenuKind,
-    index: usize,
-    css_content: RwSignal<String>,
-    export_mode: RwSignal<ExportMode>,
-    file_tick: RwSignal<u32>,
-    status_message: RwSignal<String>,
-    pending_modules: RwSignal<Vec<CssModule>>,
-    active_dialog: RwSignal<Option<DialogKind>>,
-    workbench_zoom: RwSignal<f64>,
-) {
     match (menu, index) {
         (MenuKind::File, 0) => {
             let _ = std::fs::create_dir_all(TARGET_DIR);
@@ -392,7 +354,8 @@ fn run_command(
             Err(err) => status_message.set(format!("Could not open export folder: {err}")),
         },
         (MenuKind::File, 5) => {
-            status_message.set("Quit is not wired yet.".to_string());
+            // Instantly terminates the main thread and the background file watcher
+            std::process::exit(0);
         }
 
         (MenuKind::Edit, 0) => {
@@ -418,14 +381,22 @@ fn run_command(
             export_mode.set(ExportMode::BloggerXml);
             status_message.set("Switched to Blogger Skin wrapper mode.".to_string());
         }
-        (MenuKind::View, 2) => set_workbench_zoom(workbench_zoom, status_message, 0.90, "Compact View"),
-        (MenuKind::View, 3) => set_workbench_zoom(workbench_zoom, status_message, 1.00, "Normal View"),
-        (MenuKind::View, 4) => set_workbench_zoom(workbench_zoom, status_message, 1.10, "Comfortable View"),
+        (MenuKind::View, 2) => {
+            set_workbench_zoom(workbench_zoom, status_message, 0.90, "Compact View")
+        }
+        (MenuKind::View, 3) => {
+            set_workbench_zoom(workbench_zoom, status_message, 1.00, "Normal View")
+        }
+        (MenuKind::View, 4) => {
+            set_workbench_zoom(workbench_zoom, status_message, 1.10, "Comfortable View")
+        }
         (MenuKind::View, 5) => {
             let next = (workbench_zoom.get() - ZOOM_STEP).max(ZOOM_MIN);
             set_workbench_zoom(workbench_zoom, status_message, next, "Zoom Out");
         }
-        (MenuKind::View, 6) => set_workbench_zoom(workbench_zoom, status_message, 1.00, "Reset Zoom"),
+        (MenuKind::View, 6) => {
+            set_workbench_zoom(workbench_zoom, status_message, 1.00, "Reset Zoom")
+        }
         (MenuKind::View, 7) => {
             let next = (workbench_zoom.get() + ZOOM_STEP).min(ZOOM_MAX);
             set_workbench_zoom(workbench_zoom, status_message, next, "Zoom In");
@@ -445,17 +416,20 @@ fn run_command(
             let _ = std::fs::create_dir_all(TARGET_DIR);
 
             match open_path(TARGET_DIR) {
-                Ok(_) => status_message.set("Opened refactored sheets folder: src_css.".to_string()),
+                Ok(_) => {
+                    status_message.set("Opened refactored sheets folder: src_css.".to_string())
+                }
                 Err(err) => status_message.set(format!("Could not open refactored folder: {err}")),
             }
         }
         (MenuKind::Tools, 4) => match clear_import_file(IMPORT_FILE) {
             Ok(_) => {
                 pending_modules.set(Vec::new());
-                status_message.set("Cleared import.css and canceled pending import preview.".to_string());
+                status_message
+                    .set("Cleared import.css and canceled pending import preview.".to_string());
             }
             Err(err) => status_message.set(format!("Could not clear import.css: {err}")),
-        }
+        },
         (MenuKind::Tools, 5) => {
             active_dialog.set(Some(DialogKind::Settings));
             status_message.set("Opened settings dialog.".to_string());
@@ -486,7 +460,10 @@ fn set_workbench_zoom(
 ) {
     let zoom = zoom.clamp(ZOOM_MIN, ZOOM_MAX);
     workbench_zoom.set(zoom);
-    status_message.set(format!("{label}: workbench width preset set to {:.0}%.", zoom * 100.0));
+    status_message.set(format!(
+        "{label}: workbench width preset set to {:.0}%.",
+        zoom * 100.0
+    ));
 }
 
 fn inspect_import_into_pending(
@@ -560,7 +537,9 @@ fn refactor_pending_or_import(
                     Ok(written) => {
                         file_tick.update(|tick| *tick += 1);
                         pending_modules.set(Vec::new());
-                        status_message.set(format!("Refactored {written} sheet(s). Open Refactored Folder to view them."));
+                        status_message.set(format!(
+                            "Refactored {written} sheet(s). Open Refactored Folder to view them."
+                        ));
                     }
                     Err(err) => status_message.set(format!("Could not write sheets: {err}")),
                 }
@@ -591,7 +570,9 @@ fn refactor_pending_or_import(
             pending_modules.set(Vec::new());
 
             if overwrites.is_empty() {
-                status_message.set(format!("Refactored {count} sheet(s). Open Refactored Folder to view them."));
+                status_message.set(format!(
+                    "Refactored {count} sheet(s). Open Refactored Folder to view them."
+                ));
             } else {
                 status_message.set(format!(
                     "Refactored {count} sheet(s); overwrote: {}; {} Open Refactored Folder to view them.",

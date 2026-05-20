@@ -60,7 +60,11 @@ pub fn summarize_module_names(modules: &[CssModule]) -> String {
     let shown: Vec<String> = names.iter().take(5).cloned().collect();
 
     if names.len() > shown.len() {
-        format!("{} … and {} more", shown.join(", "), names.len() - shown.len())
+        format!(
+            "{} … and {} more",
+            shown.join(", "),
+            names.len() - shown.len()
+        )
     } else {
         shown.join(", ")
     }
@@ -73,7 +77,6 @@ pub fn find_overwrites(modules: &[CssModule], output_dir: &str) -> Vec<String> {
         .map(|module| module.name.clone())
         .collect()
 }
-
 
 pub fn backup_overwritten_modules(
     modules: &[CssModule],
@@ -284,7 +287,9 @@ pub fn open_path(path: &str) -> std::io::Result<()> {
 
     #[cfg(target_os = "windows")]
     {
-        Command::new("cmd").args(["/C", "start", "", path]).spawn()?;
+        Command::new("cmd")
+            .args(["/C", "start", "", path])
+            .spawn()?;
     }
 
     Ok(())
